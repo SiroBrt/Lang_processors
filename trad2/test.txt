@@ -1,0 +1,23 @@
+// comentario
+//@ PRUEBAS VARIAS
+//@
+int a, b=1, c;
+a=1;
+int a;
+
+//@
+main () {
+  puts("cosa");
+  printf("%s", 1 || 2, 1 && 2, ! 1, 1 != 2, 1 == 2, 1 < 2, 1 <= 2, 1 > 2, 1 >= 2, 1 % 2);
+  printf(" ", "abracadabra", 1 || 2 % 3, 8/(2+5-3));
+  printf(" ", 3>=5+1);
+  while(i<n){
+    puts("cosa");
+    j = 0;
+    while(j<i){
+      puts("cosa");
+      j = j + 1;
+    }
+    i = i + 1;
+  }
+}

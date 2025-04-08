@@ -1,0 +1,11 @@
+int a;
+int var=1;
+int var = 1, temp;
+int var = 1, temp, a=8;
+// int var = 1 + 2;
+var = 1 + 2;
+main (){
+  a = 4;
+  @ 1+2*3/4;
+}
+
