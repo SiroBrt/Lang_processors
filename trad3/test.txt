@@ -3,7 +3,6 @@
 //@
 int a, b=1, c;
 a=1;
-int a;
 
 //@
 
@@ -15,16 +14,10 @@ foo (int a, int b) {
   }
 }
 foo1 () {
-  printf("%s", 1 || 2, 1 && 2, ! 1, 1 != 2, 1 == 2, 1 < 2, 1 <= 2, 1 > 2, 1 >= 2, 1 % 2);
-  printf(" ", "abracadabra", 1 || 2 % 3, 8/(2+5-3), 3>=5+1);
+  int a;
 }
 
 main () {
-  while(i<n){
-    foo1();
-    for(j=0; j<i; j=j+1){
-      a = foo(a,b);
-    }
-    i = i + 1;
-  }
+  int a;
+  i = i + 1;
 }
