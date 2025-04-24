@@ -1,0 +1,7 @@
+(setq a 0) (setq b 1) (setq c 0)
+(setf a 1)
+(setq a 0) (setf a (- a)) (setf i (+ i 1))
+(if (+ a b) (print "cosa") (print "nada"))
+(defun foo () (if (+ a b) (print "cosa") (print "nada")))
+(defun foo1 () (setq a 0))
+(defun main () (setq a 0) (setf a (- a)) (setf i (+ i 1)))
