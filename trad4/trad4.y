@@ -50,8 +50,10 @@ typedef struct s_attr {
 %token INTEGER       // token for integer type
 %token STRING        // token for string type
 %token MAIN          // token for keyword main 
-%token WHILE         // token for keyword while
 %token IF            // token for keyword if
+%token WHILE         // token for keyword while
+%token LOOP          // token for part of while
+%token DO            // token for part of while
 %token PRINT         // token for keyword print
 %token PRINC         // token for keyword princ
 %token SETQ          // token for keyword setq
@@ -127,19 +129,21 @@ expression:   '-' operand  %prec UNARY_SIGN  { sprintf (temp, "%s negate", $2.co
                                                $$.code = gen_code (temp) ; }
             | IF '(' expression ')' '(' branch ')' '(' branch')' { sprintf (temp, "%s IF %s ELSE %s", $3.code, $6.code, $9.code) ;
                                                $$.code = gen_code (temp) ; }
-            | IF '(' expression ')' '(' branch ')' { sprintf (temp, "%s IF %s", $6.code, $3.code) ;
+            | IF '(' expression ')' '(' branch ')' { sprintf (temp, "%s IF %s", $3.code, $6.code) ;
                                                $$.code = gen_code (temp) ; }
-            | DEFUN MAIN '(' ')' code        { sprintf (temp, ": main\n%s", $5.code) ;
+            | LOOP WHILE '(' expression ')' DO  body { sprintf (temp, "begin %s while %s repeat", $4.code, $7.code) ;
                                                $$.code = gen_code (temp) ; }
-            | DEFUN IDENTIF '(' ')' code     { sprintf (temp, ": %s\n%s", $2.code, $5.code) ;
+            | DEFUN MAIN '(' ')' body        { sprintf (temp, ": main\n%s", $5.code) ;
+                                               $$.code = gen_code (temp) ; }
+            | DEFUN IDENTIF '(' ')' body     { sprintf (temp, ": %s\n%s", $2.code, $5.code) ;
                                                $$.code = gen_code (temp) ; }
             ;
 
-branch:       code                           { $$ = $1 ; }
+branch:       body                           { $$ = $1 ; }
             | expression                     { $$ = $1 ; }
             ;
 
-code:         '(' expression ')' code        { sprintf (temp, "%s\n%s", $2.code, $4.code) ;
+body:         '(' expression ')' body        { sprintf (temp, "%s %s", $2.code, $4.code) ;
                                                $$.code = gen_code (temp) ; }
             | '(' expression ')'             { sprintf (temp, "%s", $2.code) ;
                                                $$.code = gen_code (temp) ; }
@@ -212,6 +216,9 @@ t_keyword keywords [] = {     // define the keywords
     "setq",        SETQ,
     "setf",        SETF,
     "if",          IF,
+    "while",       WHILE,
+    "loop",        LOOP,
+    "do",          DO,
     "defun",       DEFUN,
     "and",         AND,
     "or",          OR,
