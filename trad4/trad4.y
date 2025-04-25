@@ -58,21 +58,21 @@ typedef struct s_attr {
 %token SETF          // token for keyword setf
 %token AND           // token for keyword and
 %token OR            // token for keyword or
+%token NOT           // token for keyword not
 %token GEQ           // token for keyword greater equal
 %token LEQ           // token for keyword lower equal
-%token EQUAl         // token for keyword boolean equal
 %token NEQ           // token for keyword not equal
+%token MOD           // token for keyword modulus
 %token DEFUN         // token for keyword function
 
 
 
-%right '='                    // last opertation to do 
 %left OR
 %left AND
-%left EQUAl NEQ
+%left '=' NEQ
 %left '<' LEQ '>' GEQ
 %left '+' '-'
-%left '*' '/' '%'
+%left '*' '/' MOD
 %left UNARY_SIGN              // highest precedence
 
 %%                            // Section 3 Grammar - Semantic Actions
@@ -85,15 +85,35 @@ r_axiom:                                     { ; }
             | axiom                          { ; }
             ;
 
-expression:   '+' operand operand            { sprintf (temp, "%s %s +", $2.code, $3.code) ;
+expression:   '-' operand  %prec UNARY_SIGN  { sprintf (temp, "%s negate", $2.code) ;
                                                $$.code = gen_code (temp) ; }
-            | '-' operand                    { sprintf (temp, "%s negate", $2.code) ;
-                                               $$.code = gen_code (temp) ; }
-            | '-' operand operand            { sprintf (temp, "%s %s -", $2.code, $3.code) ;
+            | NOT operand  %prec UNARY_SIGN  { sprintf (temp, "%s 0=", $2.code) ;
                                                $$.code = gen_code (temp) ; }
             | '*' operand operand            { sprintf (temp, "%s %s *", $2.code, $3.code) ;
                                                $$.code = gen_code (temp) ; }
             | '/' operand operand            { sprintf (temp, "%s %s /", $2.code, $3.code) ;
+                                               $$.code = gen_code (temp) ; }
+            | MOD operand operand            { sprintf (temp, "%s %s mod", $2.code, $3.code) ;
+                                               $$.code = gen_code (temp) ; }
+            | '+' operand operand            { sprintf (temp, "%s %s +", $2.code, $3.code) ;
+                                               $$.code = gen_code (temp) ; }
+            | '-' operand operand            { sprintf (temp, "%s %s -", $2.code, $3.code) ;
+                                               $$.code = gen_code (temp) ; }
+            | '<' operand operand            { sprintf (temp, "%s %s <", $2.code, $3.code) ;
+                                               $$.code = gen_code (temp) ; }
+            | LEQ operand operand            { sprintf (temp, "%s %s <=", $2.code, $3.code) ;
+                                               $$.code = gen_code (temp) ; }
+            | '>' operand operand            { sprintf (temp, "%s %s >", $2.code, $3.code) ;
+                                               $$.code = gen_code (temp) ; }
+            | GEQ operand operand            { sprintf (temp, "%s %s >=", $2.code, $3.code) ;
+                                               $$.code = gen_code (temp) ; }
+            | '=' operand operand            { sprintf (temp, "%s %s =", $2.code, $3.code) ;
+                                               $$.code = gen_code (temp) ; }
+            | NEQ operand operand            { sprintf (temp, "%s %s = 0=", $2.code, $3.code) ;
+                                               $$.code = gen_code (temp) ; }
+            | AND operand operand            { sprintf (temp, "%s %s and", $2.code, $3.code) ;
+                                               $$.code = gen_code (temp) ; }
+            | OR operand operand             { sprintf (temp, "%s %s or", $2.code, $3.code) ;
                                                $$.code = gen_code (temp) ; }
             | PRINT STRING                   { sprintf (temp, ".\" %s\"", $2.code) ;
                                                $$.code = gen_code (temp) ; }
@@ -105,9 +125,9 @@ expression:   '+' operand operand            { sprintf (temp, "%s %s +", $2.code
                                                $$.code = gen_code (temp) ; }
             | SETF IDENTIF operand           { sprintf (temp, "%s %s !", $3.code, $2.code) ;
                                                $$.code = gen_code (temp) ; }
-            | IF operand '(' branch ')' '(' branch')' { sprintf (temp, " %s IF %s ELSE %s", $2.code, $4.code, $7.code) ;
+            | IF '(' expression ')' '(' branch ')' '(' branch')' { sprintf (temp, "%s IF %s ELSE %s", $3.code, $6.code, $9.code) ;
                                                $$.code = gen_code (temp) ; }
-            | IF operand '(' branch ')'      { sprintf (temp, " %s IF %s", $3.code, $2.code) ;
+            | IF '(' expression ')' '(' branch ')' { sprintf (temp, "%s IF %s", $6.code, $3.code) ;
                                                $$.code = gen_code (temp) ; }
             | DEFUN MAIN '(' ')' code        { sprintf (temp, "main\n%s", $5.code) ;
                                                $$.code = gen_code (temp) ; }
@@ -191,7 +211,15 @@ t_keyword keywords [] = {     // define the keywords
     "princ",       PRINC,
     "setq",        SETQ,
     "setf",        SETF,
+    "if",          IF,
     "defun",       DEFUN,
+    "and",         AND,
+    "or",          OR,
+    "not",         NOT,
+    "/=",          NEQ,
+    "<=",          LEQ,
+    ">=",          GEQ,
+    "mod",         MOD,
     NULL,          0          // 0 to mark the end of the table
 } ;
 
