@@ -86,9 +86,9 @@ r_axiom:                                     { ; }
             | axiom                          { ; }
             ;
 
-function_rec: MAIN '(' ')' '{' code '}'      { sprintf(temp, "(defun main () %s)\n", $5.code) ; 
+function_rec: MAIN '(' ')' '{' body '}'      { sprintf(temp, "(defun main () %s)\n", $5.code) ; 
                                                $$.code = gen_code(temp) ; }
-            | IDENTIF '(' arg_def ')' '{' code '}' function_rec        
+            | IDENTIF '(' arg_def ')' '{' body '}' function_rec        
               { sprintf(temp, "(defun %s (%s) %s)\n%s", $1.code, $3.code, $6.code, $8.code) ; 
                 $$.code = gen_code(temp) ; }
 
@@ -113,9 +113,9 @@ arg_pas_rec:  expression ',' arg_pas_rec     { sprintf(temp, " %s,%s", $1.code, 
             | expression                     { sprintf(temp, " %s", $1.code) ;
                                                $$.code = gen_code(temp) ; }
 
-code:         control_sentence code          { sprintf (temp, "%s %s", $1.code, $2.code) ;
+body:         control_sentence body          { sprintf (temp, "%s %s", $1.code, $2.code) ;
                                                $$.code = gen_code(temp) ; }
-            | sentence ';' code              { sprintf (temp, "%s %s", $1.code, $3.code) ;
+            | sentence ';' body              { sprintf (temp, "%s %s", $1.code, $3.code) ;
                                                $$.code = gen_code(temp) ; }
             | control_sentence               { $$ = $1 ; }
             | sentence ';'                   { $$ = $1 ; }
@@ -137,16 +137,16 @@ sentence:     INTEGER rec_def                { $$ = $2 ; }
             ; 
 
 control_sentence:
-              WHILE '(' expression ')' '{' code '}'
+              WHILE '(' expression ')' '{' body '}'
               { sprintf (temp, "(loop while %s do %s)", $3.code, $6.code) ;  
                 $$.code = gen_code (temp) ; }
-            | IF '(' expression ')' '{' code '}' 
+            | IF '(' expression ')' '{' body '}' 
               { sprintf (temp, "(if %s %s)", $3.code, $6.code) ;
                 $$.code = gen_code (temp) ; }
-            | IF '(' expression ')' '{' code '}' ELSE '{' code '}' 
+            | IF '(' expression ')' '{' body '}' ELSE '{' body '}' 
               { sprintf (temp, "(if %s %s %s)", $3.code, $6.code, $10.code) ;
                 $$.code = gen_code (temp) ; }
-            | FOR '(' axiom_sentence ';' expression ';' IDENTIF '=' expression ')' '{' code '}' 
+            | FOR '(' axiom_sentence ';' expression ';' IDENTIF '=' expression ')' '{' body '}' 
               { sprintf (temp, "%s (loop while %s do %s (setf %s %s))", $3.code , $5.code, $12.code, $7.code, $9.code) ;
                 $$.code = gen_code (temp) ; }
             ;

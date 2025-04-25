@@ -129,9 +129,9 @@ expression:   '-' operand  %prec UNARY_SIGN  { sprintf (temp, "%s negate", $2.co
                                                $$.code = gen_code (temp) ; }
             | IF '(' expression ')' '(' branch ')' { sprintf (temp, "%s IF %s", $6.code, $3.code) ;
                                                $$.code = gen_code (temp) ; }
-            | DEFUN MAIN '(' ')' code        { sprintf (temp, "main\n%s", $5.code) ;
+            | DEFUN MAIN '(' ')' code        { sprintf (temp, ": main\n%s", $5.code) ;
                                                $$.code = gen_code (temp) ; }
-            | DEFUN IDENTIF '(' ')' code     { sprintf (temp, "%s\n%s", $2.code, $5.code) ;
+            | DEFUN IDENTIF '(' ')' code     { sprintf (temp, ": %s\n%s", $2.code, $5.code) ;
                                                $$.code = gen_code (temp) ; }
             ;
 
