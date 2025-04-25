@@ -133,10 +133,22 @@ expression:   '-' operand  %prec UNARY_SIGN  { sprintf (temp, "%s negate", $2.co
                                                $$.code = gen_code (temp) ; }
             | LOOP WHILE '(' expression ')' DO  body { sprintf (temp, "begin %s while %s repeat", $4.code, $7.code) ;
                                                $$.code = gen_code (temp) ; }
-            | DEFUN MAIN '(' ')' body        { sprintf (temp, ": main\n%s", $5.code) ;
+            | DEFUN MAIN '(' ')' body        { sprintf (temp, ": main\n%s ;", $5.code) ;
                                                $$.code = gen_code (temp) ; }
-            | DEFUN IDENTIF '(' ')' body     { sprintf (temp, ": %s\n%s", $2.code, $5.code) ;
+            | DEFUN IDENTIF '(' arguments ')' body  { sprintf (temp, ": %s\n%s ;", $2.code, $6.code) ;
                                                $$.code = gen_code (temp) ; }
+            | IDENTIF                        { $$ = $1 ; }
+            | MAIN                           { sprintf (temp, "main") ;
+                                               $$.code = gen_code (temp) ; }
+            ;
+
+arguments:    rec_args                       { $$ = $1 ; }
+            |                                { temp[0] = '\0' ;
+                                               $$.code = gen_code(temp) ; }
+
+rec_args:    IDENTIF ',' arguments           { sprintf (temp, "%s, %s", $1.code, $3.code) ;
+                                               $$.code = gen_code (temp) ; }
+            | IDENTIF                        { $$ = $1 ; }
             ;
 
 branch:       body                           { $$ = $1 ; }
