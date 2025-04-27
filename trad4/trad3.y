@@ -78,7 +78,7 @@ typedef struct s_attr {
 %%                            // Section 3 Grammar - Semantic Actions
 
 axiom:        axiom_sentence ';'             { printf ("%s\n", $1.code) ; }
-                r_axiom
+              r_axiom
             | function_rec                   { printf ("%s", $1.code) ; }
             ;
 
@@ -91,6 +91,7 @@ function_rec: MAIN '(' ')' '{' body returning'}'      { sprintf(temp, "(defun ma
             | IDENTIF '(' arg_def ')' '{' body returning'}' function_rec        
               { sprintf(temp, "(defun %s (%s) %s %s)\n%s", $1.code, $3.code, $6.code, $7.code, $9.code) ; 
                 $$.code = gen_code(temp) ; }
+            ;
 
 returning:    RETURN expression ';'          { sprintf(temp, "(+ %s 0)", $2.code) ; 
                                                $$.code = gen_code(temp) ; }
@@ -109,7 +110,7 @@ arg_def_rec:  INTEGER IDENTIF ',' arg_def_rec{ sprintf(temp, "%s, %s", $2.code, 
                                                $$.code = gen_code(temp) ; }
             ;
 
-func_call:    IDENTIF '(' arg_passed ')'       { sprintf (temp, "(%s%s)", $1.code, $3.code) ;
+func_call:    IDENTIF '(' arg_passed ')'     { sprintf (temp, "(%s%s)", $1.code, $3.code) ;
                                                $$.code = gen_code (temp) ; }    
             ;
 
@@ -139,7 +140,7 @@ axiom_sentence:
             ;
             
 sentence:     INTEGER rec_def                { $$ = $2 ; }
-            | IDENTIF '=' expression         { sprintf (temp, "(setf %s %s)", $1.code, $3.code) ;
+            | variable '=' expression        { sprintf (temp, "(setf %s %s)", $1.code, $3.code) ;
                                                $$.code = gen_code(temp) ; }
             | PUTS '(' STRING ')'            { sprintf (temp, "(print \"%s\")", $4.code) ;  
                                                $$.code = gen_code (temp) ; }
@@ -181,6 +182,9 @@ definition:   IDENTIF                        { sprintf (temp, "(setq %s 0)", $1.
                                                $$.code = gen_code(temp) ; }
             | IDENTIF '=' NUMBER             { sprintf (temp, "(setq %s %d)", $1.code, $3.value) ;
                                                $$.code = gen_code(temp) ; }
+            | IDENTIF '[' NUMBER ']'         { sprintf (temp, "(setq %s (make-array %d))", $1.code, $3.value) ;
+                                               $$.code = gen_code(temp) ; }
+            ;
           
 expression:   term                           { $$ = $1 ; }
             | expression '+' expression      { sprintf (temp, "(+ %s %s)", $1.code, $3.code) ;
@@ -221,9 +225,14 @@ term:         operand                        { $$ = $1 ; }
             | func_call                      { $$ = $1 ; }
             ;
 
-operand:      IDENTIF                        { sprintf (temp, "%s", $1.code) ;
-                                               $$.code = gen_code (temp) ; }
+operand:      variable                       { $$ = $1 ; }
             | NUMBER                         { sprintf (temp, "%d", $1.value) ;
+                                               $$.code = gen_code (temp) ; }
+            ;
+
+variable:     IDENTIF                        { sprintf (temp, "%s", $1.code) ;
+                                               $$.code = gen_code (temp) ; }
+            | IDENTIF '[' expression ']'         { sprintf (temp, "(aref %s %s)", $1.code, $3.code) ;
                                                $$.code = gen_code (temp) ; }
             ;
 
