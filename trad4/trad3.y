@@ -86,32 +86,43 @@ r_axiom:                                     { ; }
             | axiom                          { ; }
             ;
 
-function_rec: MAIN '(' ')' '{' body '}'      { sprintf(temp, "(defun main () %s)\n", $5.code) ; 
+function_rec: MAIN '(' ')' '{' body returning'}'      { sprintf(temp, "(defun main () %s %s)\n", $5.code, $6.code) ; 
                                                $$.code = gen_code(temp) ; }
-            | IDENTIF '(' arg_def ')' '{' body '}' function_rec        
-              { sprintf(temp, "(defun %s (%s) %s)\n%s", $1.code, $3.code, $6.code, $8.code) ; 
+            | IDENTIF '(' arg_def ')' '{' body returning'}' function_rec        
+              { sprintf(temp, "(defun %s (%s) %s %s)\n%s", $1.code, $3.code, $6.code, $7.code, $9.code) ; 
                 $$.code = gen_code(temp) ; }
+
+returning:    RETURN expression ';'          { sprintf(temp, "(+ %s 0)", $2.code) ; 
+                                               $$.code = gen_code(temp) ; }
+            |                                { temp[0] = '\0' ;
+                                               $$.code = gen_code(temp) ; }
+            ;
 
 arg_def:      arg_def_rec                    { $$ = $1 ; }
             |                                { temp[0] = '\0' ;
                                                $$.code = gen_code(temp) ; }
+            ;
 
 arg_def_rec:  INTEGER IDENTIF ',' arg_def_rec{ sprintf(temp, "%s, %s", $2.code, $4.code) ;
                                                $$.code = gen_code(temp) ; }
             | INTEGER IDENTIF                { sprintf(temp, "%s", $2.code) ; 
                                                $$.code = gen_code(temp) ; }
+            ;
 
 func_call:    IDENTIF '(' arg_passed ')'       { sprintf (temp, "(%s%s)", $1.code, $3.code) ;
                                                $$.code = gen_code (temp) ; }    
+            ;
 
 arg_passed:   arg_pas_rec                    { $$ = $1 ; }
             |                                { temp[0] = '\0' ;
                                                $$.code = gen_code(temp) ; }
+            ;
 
 arg_pas_rec:  expression ',' arg_pas_rec     { sprintf(temp, " %s,%s", $1.code, $3.code) ;
                                                $$.code = gen_code(temp) ; }
             | expression                     { sprintf(temp, " %s", $1.code) ;
                                                $$.code = gen_code(temp) ; }
+            ;
 
 body:         control_sentence body          { sprintf (temp, "%s %s", $1.code, $2.code) ;
                                                $$.code = gen_code(temp) ; }
