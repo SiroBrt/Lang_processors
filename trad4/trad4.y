@@ -104,7 +104,7 @@ arg_def:      arg_def_rec                    { $$ = $1 ; }
                                                $$.code = gen_code(temp) ; }
             ;
 
-arg_def_rec:  INTEGER IDENTIF ',' arg_def_rec{ sprintf(temp, "%s, %s", $2.code, $4.code) ;
+arg_def_rec:  INTEGER IDENTIF ',' arg_def_rec{ sprintf(temp, "%s %s", $2.code, $4.code) ;
                                                $$.code = gen_code(temp) ; }
             | INTEGER IDENTIF                { sprintf(temp, "%s", $2.code) ; 
                                                $$.code = gen_code(temp) ; }
@@ -119,7 +119,7 @@ arg_passed:   arg_pas_rec                    { $$ = $1 ; }
                                                $$.code = gen_code(temp) ; }
             ;
 
-arg_pas_rec:  expression ',' arg_pas_rec     { sprintf(temp, " %s,%s", $1.code, $3.code) ;
+arg_pas_rec:  expression ',' arg_pas_rec     { sprintf(temp, " %s%s", $1.code, $3.code) ;
                                                $$.code = gen_code(temp) ; }
             | expression                     { sprintf(temp, " %s", $1.code) ;
                                                $$.code = gen_code(temp) ; }

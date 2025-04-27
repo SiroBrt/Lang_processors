@@ -123,32 +123,36 @@ expression:   '-' operand  %prec UNARY_SIGN  { sprintf (temp, "%s negate", $2.co
                                                $$.code = gen_code (temp) ; }
             | PRINC STRING                   { sprintf (temp, "%s .", $2.code) ;
                                                $$.code = gen_code (temp) ; }
-            | SETQ IDENTIF operand           { sprintf (temp, "%s %s !", $3.code, $2.code) ;
+            | SETQ IDENTIF operand           { sprintf (temp, "variable %s %s %s !", $2.code, $3.code, $2.code) ;
                                                $$.code = gen_code (temp) ; }
             | SETF IDENTIF operand           { sprintf (temp, "%s %s !", $3.code, $2.code) ;
                                                $$.code = gen_code (temp) ; }
-            | IF '(' expression ')' '(' branch ')' '(' branch')' { sprintf (temp, "%s IF %s ELSE %s", $3.code, $6.code, $9.code) ;
+            | IF '(' expression ')' '(' branch ')' '(' branch')' { sprintf (temp, "%s IF %s ELSE %s THEN", $3.code, $6.code, $9.code) ;
                                                $$.code = gen_code (temp) ; }
-            | IF '(' expression ')' '(' branch ')' { sprintf (temp, "%s IF %s", $3.code, $6.code) ;
+            | IF '(' expression ')' '(' branch ')' { sprintf (temp, "%s IF %s THEN", $3.code, $6.code) ;
                                                $$.code = gen_code (temp) ; }
-            | LOOP WHILE '(' expression ')' DO  body { sprintf (temp, "begin %s while %s repeat", $4.code, $7.code) ;
+            | LOOP WHILE '(' expression ')' DO  body { sprintf (temp, "BEGIN %s WHILE %s REPEAT", $4.code, $7.code) ;
                                                $$.code = gen_code (temp) ; }
             | DEFUN MAIN '(' ')' body        { sprintf (temp, ": main\n%s ;", $5.code) ;
                                                $$.code = gen_code (temp) ; }
-            | DEFUN IDENTIF '(' arguments ')' body  { sprintf (temp, ": %s\n%s ;", $2.code, $6.code) ;
+            | DEFUN IDENTIF '(' arg_def ')' body { sprintf (temp, ": %s\n%s\n%s ;", $2.code, $4.code, $6.code) ;
                                                $$.code = gen_code (temp) ; }
-            | IDENTIF                        { $$ = $1 ; }
+            | IDENTIF arguments              { sprintf (temp, "%s%s", $2.code, $1.code) ;
+                                               $$.code = gen_code (temp) ; }
             | MAIN                           { sprintf (temp, "main") ;
                                                $$.code = gen_code (temp) ; }
             ;
 
-arguments:    rec_args                       { $$ = $1 ; }
+arg_def:      IDENTIF  arg_def               { sprintf (temp, "%svariable %s %s ! ", $2.code, $1.code, $1.code) ;
+                                               $$.code = gen_code (temp) ; }
             |                                { temp[0] = '\0' ;
                                                $$.code = gen_code(temp) ; }
+            ;
 
-rec_args:    IDENTIF ',' arguments           { sprintf (temp, "%s, %s", $1.code, $3.code) ;
+arguments:    operand  arguments             { sprintf (temp, "%s %s", $1.code, $2.code) ;
                                                $$.code = gen_code (temp) ; }
-            | IDENTIF                        { $$ = $1 ; }
+            |                                { temp[0] = '\0' ;
+                                               $$.code = gen_code(temp) ; }
             ;
 
 branch:       body                           { $$ = $1 ; }
@@ -161,7 +165,7 @@ body:         '(' expression ')' body        { sprintf (temp, "%s %s", $2.code, 
                                                $$.code = gen_code (temp) ; }
             ;
 
-operand:      IDENTIF                        { sprintf (temp, "%s", $1.code) ;
+operand:      IDENTIF                        { sprintf (temp, "%s @", $1.code) ;
                                                $$.code = gen_code (temp) ; }
             | NUMBER                         { sprintf (temp, "%d", $1.value) ;
                                                $$.code = gen_code (temp) ; }
