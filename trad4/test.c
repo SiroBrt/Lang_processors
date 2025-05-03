@@ -1,21 +1,29 @@
-// comentario
-//@
-int a, b = 1, c;
-a = 1;
+#include <stdio.h>
 
-//@
+fibonacci (int n) {
+	int retorno;
 
-foo(int a, int b) {
-  if (a == b) {
-    puts("cosa");
-  } else {
-    puts("nada");
-  }
+	if (n < 2) {
+		retorno = 1;
+	} else {
+		retorno = fibonacci (n-1) + fibonacci (n-2) ;
+	}
+
+	return retorno;
 }
-foo1() { int a; }
 
-main() {
-  int a;
-  a = -a;
-  i = i + 1;
+main ()
+{
+	int resultado;
+	int i ;
+
+        puts ("Sucesion de Fibonacci") ;
+
+        for (i = 2 ; i < 50 ; i = i + 1) {
+		resultado = fibonacci (i) ;
+                printf ("%d %d\n", i, resultado) ;
+        }
 }
+
+//@ (main) 
+
