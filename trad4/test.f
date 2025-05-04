@@ -1,9 +1,0 @@
-variable resultado
-0 resultado !
-variable n 
-0 n !
-7 n !
-1 resultado !
-BEGIN n @ 1 > 
-WHILE resultado @ n @ * resultado ! n @ 1 - n ! 
-REPEAT resultado @ .
