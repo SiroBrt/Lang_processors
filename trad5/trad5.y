@@ -148,7 +148,8 @@ sentence:     INTEGER rec_def                { $$ = $2 ; }
                                                $$.code = gen_code(temp) ; }
             | PUTS '(' STRING ')'            { sprintf (temp, "(print \"%s\")", $4.code) ;  
                                                $$.code = gen_code (temp) ; }
-            | IMPRIMIR '(' STRING ',' rec_print ')' { $$ = $5 ; }
+            | IMPRIMIR '(' STRING ',' rec_print ')' { sprintf (temp, "(progn %s)", $5.code) ;  
+                                               $$.code = gen_code (temp) ; }
             | RETURN expression              { sprintf(temp, "(return-from %s %s)", func_name, $2.code) ; 
                                                $$.code = gen_code(temp) ; }
             | func_call                      { $$ = $1 ; }
@@ -158,15 +159,23 @@ control_sentence:
               WHILE '(' expression ')' '{' body_code '}'
               { sprintf (temp, "(loop while %s do %s)", $3.code, $6.code) ;  
                 $$.code = gen_code (temp) ; }
-            | IF '(' expression ')' '{' body_code '}' 
+            | IF '(' expression ')' '{' branch '}' 
               { sprintf (temp, "(if %s %s)", $3.code, $6.code) ;
                 $$.code = gen_code (temp) ; }
-            | IF '(' expression ')' '{' body_code '}' ELSE '{' body_code '}' 
+            | IF '(' expression ')' '{' branch '}' ELSE '{' branch '}' 
               { sprintf (temp, "(if %s %s %s)", $3.code, $6.code, $10.code) ;
                 $$.code = gen_code (temp) ; }
             | FOR '(' axiom_sentence ';' expression ';' IDENTIF '=' expression ')' '{' body_code '}' 
               { sprintf (temp, "%s (loop while %s do %s (setf %s %s))", $3.code , $5.code, $12.code, $7.code, $9.code) ;
                 $$.code = gen_code (temp) ; }
+            ;
+
+branch:       control_sentence body_code     { sprintf (temp, "(progn %s %s)", $1.code, $2.code) ;
+                                               $$.code = gen_code(temp) ; }
+            | sentence ';' body_code         { sprintf (temp, "(progn %s %s)", $1.code, $3.code) ;
+                                               $$.code = gen_code(temp) ; }
+            | control_sentence               { $$ = $1 ; }
+            | sentence ';'                   { $$ = $1 ; }
             ;
 
 rec_print:    expression ',' rec_print       { sprintf (temp, "(princ %s) %s",$1.code, $3.code);
