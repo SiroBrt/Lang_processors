@@ -6,7 +6,7 @@
 collatz (int n, int cont) {
 	int retorno;
 
-    printf ("%d ", n) ;
+    printf ("%d %s", n, " ") ;
 
     if (n == 1) {
 		retorno = cont ;
@@ -29,7 +29,8 @@ main ()
 	puts ("Sucesion de Collatz") ;
     for (i = 2 ; i < 100 ; i = i + 1) {
 		resultado = collatz (i, 0) ;
-		printf ("   %d %d\n", i, resultado) ;
+		printf ("   %d %s %d", i, " ", resultado) ;
+		puts (" ") ;
     }
 }
 

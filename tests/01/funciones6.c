@@ -1,10 +1,9 @@
 #include <stdio.h>
 
-
 factorialA (int n, int f, int fm) 
 {
 	if (n == 1) {
-	    printf ("%d", f) ;
+	    printf ("%d %s", f, " ") ;
 	} else {
 	    factorialA (n-1, f*fm, fm-1) ;
 	}  
@@ -24,7 +23,8 @@ main ()
 	factorialWrapper (4) ;          
 	factorialWrapper (5) ;          
 	factorialWrapper (6) ;          
-//     system ("pause") ;
+//    system ("pause") ;
 }
 
 //@ (main)
+

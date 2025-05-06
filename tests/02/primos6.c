@@ -17,18 +17,17 @@ main ()
     for (i = 1 ; i <= m ; i=i+1) {  
         primo = 1 ;
         for (d = 2 ; d < i ; d=d+1) {
-            if (i % d == 0) {
+            if (i % d == 0) { // check precedences
                 primo = 0 ;
             }
         }
 
         if (primo != 0) {
-            printf ("%d  ", i) ;
+            printf ("%d %s", i, " ") ;
         }
 
     }
 }
 
 //@ (main)
-
 

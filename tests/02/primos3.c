@@ -31,7 +31,7 @@ main ()
     i = 1 ; 
     while (i < m) { 
         if (primos [i] == 1) {
-            printf (" %d  ", i) ;
+            printf ("%d %s", i, " ") ;
         }
         i = i + 1 ;
     }

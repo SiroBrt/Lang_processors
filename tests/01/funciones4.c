@@ -3,7 +3,7 @@
 
 cuadrado (int n) 
 {
-	printf ("cuadrado de n %d %d", n, n*n) ;
+	printf ("cuadrado de n %d %s %d", n, " ", n*n) ;
 	puts ("") ;
 }
 
@@ -17,3 +17,4 @@ main ()
 }
 
 //@ (main)
+

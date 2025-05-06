@@ -20,7 +20,8 @@ main ()
 
     i = 1 ; 
     while (i <= m) { 
-        printf (" %d %d\n", i, potencias [i]) ;
+        printf (" %d %s %d", i, " ", potencias [i]) ;
+        puts ("") ;
         i = i + 1 ;
     }
 }

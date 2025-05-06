@@ -21,7 +21,8 @@ main ()
 
         for (i = 2 ; i < 50 ; i = i + 1) {
 		resultado = fibonacci (i) ;
-                printf ("%d %d\n", i, resultado) ;
+                printf ("%d %s %d", i, " ", resultado) ;
+                puts (" ") ;
         }
 }
 

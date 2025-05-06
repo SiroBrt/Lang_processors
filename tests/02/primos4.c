@@ -26,10 +26,9 @@ listaprimos (int n, int m)
 {
     while (n < m) {
         if (esprimo (n) != 0) {
-            printf ("%d  ", n) ;
+            printf ("%d %s", n, " ") ;
         }
         n = n + 1 ;
-//		puts ("") ;
     } 
 }
 

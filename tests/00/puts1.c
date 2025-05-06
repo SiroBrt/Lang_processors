@@ -2,7 +2,7 @@
  
 main () 
 {
-	puts ("El texto se imprime ") ;
+	puts (" El texto se imprime ") ;
 }
 
 //@ (main)

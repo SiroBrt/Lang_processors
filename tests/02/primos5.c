@@ -17,7 +17,7 @@ main ()
     for (i = 1 ; i <= m ; i=i+1) {  
         d = 2 ;
         primo = 1 ;
-        while (primo == 1 && d<i) { 
+        while (primo == 1 && d<i) { // check precedences 
             p = i % d ;
             if (p == 0) {
                 primo = 0 ;
@@ -26,7 +26,7 @@ main ()
         }
 
         if (primo == 1) {
-            printf ("%d  ", i) ;
+            printf ("%d %s", i, " ") ;
         }
     }
 }

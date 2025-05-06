@@ -21,8 +21,8 @@ main ()
     puts ("Sucesion de Fibonacci") ;
     for (i = 0 ; i < 47 ; i = i + 1) {
 		resultado = fibonacci (0, 1, i) ;
-//		puts (" ") ;
-        printf ("%d %d\n", i, resultado) ;
+        printf ("%d %s %d", i, " ", resultado) ;
+		puts (" ") ;
     }
 }
 

@@ -9,7 +9,8 @@ factorial (int n) {
 		retorno = n * factorial (n-1) ;
 	}
 
-    printf ("%d %d\n", n, retorno) ;
+    printf ("%d %s %d", n, " ", retorno) ;
+    puts (" ") ;
 
 	return retorno;
 }

@@ -1,6 +1,5 @@
 #include <stdio.h>
 
-
 mifuncion () 
 {
     puts ("Una prueba") ;
@@ -15,3 +14,4 @@ main ()
 }
 
 //@ (main)
+

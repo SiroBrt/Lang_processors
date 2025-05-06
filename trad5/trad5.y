@@ -15,9 +15,13 @@ char *my_malloc (int) ;
 char *gen_code (char *) ;
 char *int_to_string (int) ;
 char *char_to_string (char) ;
+int is_global(char *) ;
 
 char temp [2048] ;
 char func_name [256] ;
+int global_it;
+char global_var [256][256] ;
+
 
 
 // Abstract Syntax Tree (AST) Node Structure
@@ -89,11 +93,11 @@ r_axiom:                                     { ; }
 
 function_rec:                                { printf("(defun main () ");
                                                sprintf(func_name, "main") ; }
-              MAIN '(' ')' '{' print_code '}' { printf(")\n") ; } 
+              MAIN '(' ')' '{' print_code '}'{ printf(")\n") ; } 
             | IDENTIF                        { printf("(defun %s (", $1.code) ;
                                                sprintf(func_name, "%s", $1.code) ; }
               '(' arg_def ')'                { printf(") ") ; }
-              '{' print_code '}'              { printf(")\n\n") ; }
+              '{' print_code '}'             { printf(")\n\n") ; }
               function_rec      
             ;
 
@@ -101,9 +105,9 @@ arg_def:      arg_def_rec                    { printf("%s", $1.code) ; }
             |                                { ; }
             ;
 
-arg_def_rec:  INTEGER IDENTIF ',' arg_def_rec{ sprintf(temp, "%s %s", $2.code, $4.code) ;
+arg_def_rec:  INTEGER IDENTIF ',' arg_def_rec{ sprintf(temp, "%s_%s %s", func_name, $2.code, $4.code) ;
                                                $$.code = gen_code(temp) ; }
-            | INTEGER IDENTIF                { sprintf(temp, "%s", $2.code) ; 
+            | INTEGER IDENTIF                { sprintf(temp, "%s_%s", func_name, $2.code) ; 
                                                $$.code = gen_code(temp) ; }
             ;
 
@@ -122,19 +126,19 @@ arg_pas_rec:  expression ',' arg_pas_rec     { sprintf(temp, " %s%s", $1.code, $
                                                $$.code = gen_code(temp) ; }
             ;
 
-print_code:    body                           { printf("%s", $1.code) ;}
+print_code:    body_code                     { printf("%s", $1.code) ;}
             ;
 
-body:         control_sentence body          { sprintf (temp, "%s %s", $1.code, $2.code) ;
+body_code:    control_sentence body_code     { sprintf (temp, "%s %s", $1.code, $2.code) ;
                                                $$.code = gen_code(temp) ; }
-            | sentence ';' body              { sprintf (temp, "%s %s", $1.code, $3.code) ;
+            | sentence ';' body_code         { sprintf (temp, "%s %s", $1.code, $3.code) ;
                                                $$.code = gen_code(temp) ; }
             | control_sentence               { $$ = $1 ; }
             | sentence ';'                   { $$ = $1 ; }
             ;
 
 axiom_sentence:
-              INTEGER rec_def                { $$ = $2 ; }
+              INTEGER ax_rec_def                { $$ = $2 ; }
             | IDENTIF '=' operand            { sprintf (temp, "(setf %s %s)", $1.code, $3.code) ;
                                                $$.code = gen_code(temp) ; }
             ;
@@ -151,16 +155,16 @@ sentence:     INTEGER rec_def                { $$ = $2 ; }
             ; 
 
 control_sentence:
-              WHILE '(' expression ')' '{' body '}'
+              WHILE '(' expression ')' '{' body_code '}'
               { sprintf (temp, "(loop while %s do %s)", $3.code, $6.code) ;  
                 $$.code = gen_code (temp) ; }
-            | IF '(' expression ')' '{' body '}' 
+            | IF '(' expression ')' '{' body_code '}' 
               { sprintf (temp, "(if %s %s)", $3.code, $6.code) ;
                 $$.code = gen_code (temp) ; }
-            | IF '(' expression ')' '{' body '}' ELSE '{' body '}' 
+            | IF '(' expression ')' '{' body_code '}' ELSE '{' body_code '}' 
               { sprintf (temp, "(if %s %s %s)", $3.code, $6.code, $10.code) ;
                 $$.code = gen_code (temp) ; }
-            | FOR '(' axiom_sentence ';' expression ';' IDENTIF '=' expression ')' '{' body '}' 
+            | FOR '(' axiom_sentence ';' expression ';' IDENTIF '=' expression ')' '{' body_code '}' 
               { sprintf (temp, "%s (loop while %s do %s (setf %s %s))", $3.code , $5.code, $12.code, $7.code, $9.code) ;
                 $$.code = gen_code (temp) ; }
             ;
@@ -175,16 +179,35 @@ rec_print:    expression ',' rec_print       { sprintf (temp, "(princ %s) %s",$1
                                                $$.code = gen_code(temp) ; }
             ;
 
+ax_rec_def:   ax_definition ',' ax_rec_def   { sprintf (temp, "%s %s",$1.code, $3.code);
+                                               $$.code = gen_code (temp) ; }
+            | ax_definition                  { $$ = $1 ; }
+            ;
+
+ax_definition: IDENTIF                       { sprintf (temp, "(setq %s 0)", $1.code) ;
+                                               sprintf(global_var[global_it], "%s", $1.code) ;
+                                               global_it++;
+                                               $$.code = gen_code(temp) ; }
+            | IDENTIF '=' NUMBER             { sprintf (temp, "(setq %s %d)", $1.code, $3.value) ;
+                                               sprintf(global_var[global_it], "%s", $1.code) ;
+                                               global_it++;
+                                               $$.code = gen_code(temp) ; }
+            | IDENTIF '[' NUMBER ']'         { sprintf (temp, "(setq %s (make-array %d))", $1.code, $3.value) ;
+                                               sprintf(global_var[global_it], "%s", $1.code) ;
+                                               global_it++;
+                                               $$.code = gen_code(temp) ; }
+            ;
+          
 rec_def:      definition ',' rec_def         { sprintf (temp, "%s %s",$1.code, $3.code);
                                                $$.code = gen_code (temp) ; }
             | definition                     { $$ = $1 ; }
             ;
 
-definition:   IDENTIF                        { sprintf (temp, "(setq %s 0)", $1.code) ;
+definition:   IDENTIF                        { sprintf (temp, "(setq %s_%s 0)", func_name, $1.code) ;
                                                $$.code = gen_code(temp) ; }
-            | IDENTIF '=' NUMBER             { sprintf (temp, "(setq %s %d)", $1.code, $3.value) ;
+            | IDENTIF '=' NUMBER             { sprintf (temp, "(setq %s_%s %d)", func_name, $1.code, $3.value) ;
                                                $$.code = gen_code(temp) ; }
-            | IDENTIF '[' NUMBER ']'         { sprintf (temp, "(setq %s (make-array %d))", $1.code, $3.value) ;
+            | IDENTIF '[' NUMBER ']'         { sprintf (temp, "(setq %s_%s (make-array %d))", func_name, $1.code, $3.value) ;
                                                $$.code = gen_code(temp) ; }
             ;
           
@@ -232,9 +255,17 @@ operand:      variable                       { $$ = $1 ; }
                                                $$.code = gen_code (temp) ; }
             ;
 
-variable:     IDENTIF                        { sprintf (temp, "%s", $1.code) ;
+variable:     IDENTIF                        { if (is_global($1.code)){
+                                                 sprintf (temp, "%s", $1.code) ;
+                                               } else{
+                                                 sprintf (temp, "%s_%s", func_name, $1.code) ;
+                                               }
                                                $$.code = gen_code (temp) ; }
-            | IDENTIF '[' expression ']'         { sprintf (temp, "(aref %s %s)", $1.code, $3.code) ;
+            | IDENTIF '[' expression ']'     { if (is_global($1.code)){
+                                                 sprintf (temp, "(aref %s %s)", $1.code, $3.code) ;
+                                               } else{
+                                                 sprintf (temp, "(aref %s_%s %s)", func_name, $1.code, $3.code) ;
+                                               }
                                                $$.code = gen_code (temp) ; }
             ;
 
@@ -326,6 +357,15 @@ t_keyword *search_keyword (char *symbol_name)
     }
 
     return NULL ;
+}
+
+int is_global(char *var){
+  for (int i = 0; i < global_it; i++){
+    if (strcmp(global_var[i], var) == 0){
+      return 1;
+    }
+  }
+  return 0;
 }
 
  

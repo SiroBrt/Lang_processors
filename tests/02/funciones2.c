@@ -17,7 +17,7 @@ main ()
      int c ;
      
      c = mifuncion () ;
-     printf ("%d %d\n", c, mifuncion ()) ;
+     printf ("%d %s %d\n", c, " ", mifuncion ()) ;
 //     system("pause") ;
  }
 

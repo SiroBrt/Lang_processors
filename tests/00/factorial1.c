@@ -1,19 +1,16 @@
 #include <stdio.h>
 
+int resultado ;
+int n ;
 
-main ()
+main () 
 {
-    int resultado ;
-    int n ;
-
-    n=7 ;
-    resultado=1 ;
+    n = 7 ;
+    resultado = 1 ;
 
     while (n > 1) {
         resultado = resultado * n ;
         n = n - 1 ;
-
-
     }
     printf("%d\n", resultado) ;
     
@@ -21,3 +18,4 @@ main ()
 }
 
 //@ (main) 
+

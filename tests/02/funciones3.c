@@ -22,11 +22,8 @@ main ()
      printf ("%d\n", c) ;
 
      a = 12 ;
-     puts ("El cuadrado de ") ;
-     printf ("%d", a) ;
-     puts (" es ") ;
-     printf ("%d\n", cuadrado (a)) ;
-
+     printf ("%s %d %s %d ", "El cuadrado de ", a, " es: ", cuadrado (a)) ;
+     puts (" ") ;
 
 //   system("pause") ;
 }
