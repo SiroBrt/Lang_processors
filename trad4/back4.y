@@ -111,7 +111,7 @@ expression:   '-' operand  %prec UNARY_SIGN  { sprintf (temp, "%s negate", $2.co
                                                $$.code = gen_code (temp) ; }
             | '=' operand operand            { sprintf (temp, "%s %s =", $2.code, $3.code) ;
                                                $$.code = gen_code (temp) ; }
-            | NEQ operand operand            { sprintf (temp, "%s %s = 0=", $2.code, $3.code) ;
+            | NEQ operand operand            { sprintf (temp, "%s %s 0=", $2.code, $3.code) ;
                                                $$.code = gen_code (temp) ; }
             | AND operand operand            { sprintf (temp, "%s %s and", $2.code, $3.code) ;
                                                $$.code = gen_code (temp) ; }
