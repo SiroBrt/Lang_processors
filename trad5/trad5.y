@@ -91,13 +91,13 @@ r_axiom:                                     { ; }
             | axiom                          { ; }
             ;
 
-function_rec:                                { printf("(defun main () ");
+function_rec:                                { printf("(defun main ()\n  ");
                                                sprintf(func_name, "main") ; }
-              MAIN '(' ')' '{' print_code '}'{ printf(")\n") ; } 
+              MAIN '(' ')' '{' print_code '}'{ printf("\n)\n") ; } 
             | IDENTIF                        { printf("(defun %s (", $1.code) ;
                                                sprintf(func_name, "%s", $1.code) ; }
-              '(' arg_def ')'                { printf(") ") ; }
-              '{' print_code '}'             { printf(")\n\n") ; }
+              '(' arg_def ')'                { printf(")\n ") ; }
+              '{' print_code '}'             { printf("\n)\n\n") ; }
               function_rec      
             ;
 
@@ -139,7 +139,7 @@ body_code:    control_sentence body_code     { sprintf (temp, "%s %s", $1.code, 
 
 axiom_sentence:
               INTEGER ax_rec_def                { $$ = $2 ; }
-            | IDENTIF '=' operand            { sprintf (temp, "(setf %s %s)", $1.code, $3.code) ;
+            | variable '=' operand            { sprintf (temp, "(setf %s %s)", $1.code, $3.code) ;
                                                $$.code = gen_code(temp) ; }
             ;
             
@@ -165,7 +165,7 @@ control_sentence:
             | IF '(' expression ')' '{' branch '}' ELSE '{' branch '}' 
               { sprintf (temp, "(if %s %s %s)", $3.code, $6.code, $10.code) ;
                 $$.code = gen_code (temp) ; }
-            | FOR '(' axiom_sentence ';' expression ';' IDENTIF '=' expression ')' '{' body_code '}' 
+            | FOR '(' axiom_sentence ';' expression ';' variable '=' expression ')' '{' body_code '}' 
               { sprintf (temp, "%s (loop while %s do %s (setf %s %s))", $3.code , $5.code, $12.code, $7.code, $9.code) ;
                 $$.code = gen_code (temp) ; }
             ;
