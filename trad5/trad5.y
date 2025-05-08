@@ -15,12 +15,12 @@ char *my_malloc (int) ;
 char *gen_code (char *) ;
 char *int_to_string (int) ;
 char *char_to_string (char) ;
-int is_global(char *) ;
+int in_this_func(char *) ;
 
 char temp [2048] ;
 char func_name [256] ;
-int global_it;
-char global_var [256][256] ;
+int func_it;
+char func_var [256][256] ;
 
 
 
@@ -92,10 +92,12 @@ r_axiom:                                     { ; }
             ;
 
 function_rec:                                { printf("(defun main ()\n  ");
-                                               sprintf(func_name, "main") ; }
+                                               sprintf(func_name, "main") ; 
+                                               func_it = 0 ; }
               MAIN '(' ')' '{' print_code '}'{ printf("\n)\n") ; } 
             | IDENTIF                        { printf("(defun %s (", $1.code) ;
-                                               sprintf(func_name, "%s", $1.code) ; }
+                                               sprintf(func_name, "%s", $1.code) ;
+                                               func_it = 0 ; }
               '(' arg_def ')'                { printf(")\n ") ; }
               '{' print_code '}'             { printf("\n)\n\n") ; }
               function_rec      
@@ -194,16 +196,10 @@ ax_rec_def:   ax_definition ',' ax_rec_def   { sprintf (temp, "%s %s",$1.code, $
             ;
 
 ax_definition: IDENTIF                       { sprintf (temp, "(setq %s 0)", $1.code) ;
-                                               sprintf(global_var[global_it], "%s", $1.code) ;
-                                               global_it++;
                                                $$.code = gen_code(temp) ; }
             | IDENTIF '=' NUMBER             { sprintf (temp, "(setq %s %d)", $1.code, $3.value) ;
-                                               sprintf(global_var[global_it], "%s", $1.code) ;
-                                               global_it++;
                                                $$.code = gen_code(temp) ; }
             | IDENTIF '[' NUMBER ']'         { sprintf (temp, "(setq %s (make-array %d))", $1.code, $3.value) ;
-                                               sprintf(global_var[global_it], "%s", $1.code) ;
-                                               global_it++;
                                                $$.code = gen_code(temp) ; }
             ;
           
@@ -213,10 +209,16 @@ rec_def:      definition ',' rec_def         { sprintf (temp, "%s %s",$1.code, $
             ;
 
 definition:   IDENTIF                        { sprintf (temp, "(setq %s_%s 0)", func_name, $1.code) ;
+                                               sprintf(func_var[func_it], "%s", $1.code) ;
+                                               func_it++;
                                                $$.code = gen_code(temp) ; }
             | IDENTIF '=' NUMBER             { sprintf (temp, "(setq %s_%s %d)", func_name, $1.code, $3.value) ;
+                                               sprintf(func_var[func_it], "%s", $1.code) ;
+                                               func_it++;
                                                $$.code = gen_code(temp) ; }
             | IDENTIF '[' NUMBER ']'         { sprintf (temp, "(setq %s_%s (make-array %d))", func_name, $1.code, $3.value) ;
+                                               sprintf(func_var[func_it], "%s", $1.code) ;
+                                               func_it++;
                                                $$.code = gen_code(temp) ; }
             ;
           
@@ -264,16 +266,16 @@ operand:      variable                       { $$ = $1 ; }
                                                $$.code = gen_code (temp) ; }
             ;
 
-variable:     IDENTIF                        { if (is_global($1.code)){
+variable:     IDENTIF                        { if (in_this_func($1.code)){
                                                  sprintf (temp, "%s", $1.code) ;
                                                } else{
                                                  sprintf (temp, "%s_%s", func_name, $1.code) ;
                                                }
                                                $$.code = gen_code (temp) ; }
-            | IDENTIF '[' expression ']'     { if (is_global($1.code)){
-                                                 sprintf (temp, "(aref %s %s)", $1.code, $3.code) ;
-                                               } else{
+            | IDENTIF '[' expression ']'     { if (in_this_func($1.code)){
                                                  sprintf (temp, "(aref %s_%s %s)", func_name, $1.code, $3.code) ;
+                                               } else{
+                                                 sprintf (temp, "(aref %s %s)", $1.code, $3.code) ;
                                                }
                                                $$.code = gen_code (temp) ; }
             ;
@@ -368,9 +370,9 @@ t_keyword *search_keyword (char *symbol_name)
     return NULL ;
 }
 
-int is_global(char *var){
-  for (int i = 0; i < global_it; i++){
-    if (strcmp(global_var[i], var) == 0){
+int in_this_func(char *var){
+  for (int i = 0; i < func_it; i++){
+    if (strcmp(func_var[i], var) == 0){
       return 1;
     }
   }
