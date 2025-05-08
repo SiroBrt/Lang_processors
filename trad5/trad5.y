@@ -108,8 +108,12 @@ arg_def:      arg_def_rec                    { printf("%s", $1.code) ; }
             ;
 
 arg_def_rec:  INTEGER IDENTIF ',' arg_def_rec{ sprintf(temp, "%s_%s %s", func_name, $2.code, $4.code) ;
+                                               sprintf(func_var[func_it], "%s", $2.code) ;
+                                               func_it++;
                                                $$.code = gen_code(temp) ; }
             | INTEGER IDENTIF                { sprintf(temp, "%s_%s", func_name, $2.code) ; 
+                                               sprintf(func_var[func_it], "%s", $2.code) ;
+                                               func_it++;
                                                $$.code = gen_code(temp) ; }
             ;
 
@@ -140,7 +144,7 @@ body_code:    control_sentence body_code     { sprintf (temp, "%s %s", $1.code, 
             ;
 
 axiom_sentence:
-              INTEGER ax_rec_def                { $$ = $2 ; }
+              INTEGER ax_rec_def              { $$ = $2 ; }
             | variable '=' operand            { sprintf (temp, "(setf %s %s)", $1.code, $3.code) ;
                                                $$.code = gen_code(temp) ; }
             ;
@@ -267,9 +271,9 @@ operand:      variable                       { $$ = $1 ; }
             ;
 
 variable:     IDENTIF                        { if (in_this_func($1.code)){
-                                                 sprintf (temp, "%s", $1.code) ;
-                                               } else{
                                                  sprintf (temp, "%s_%s", func_name, $1.code) ;
+                                               } else{
+                                                 sprintf (temp, "%s", $1.code) ;
                                                }
                                                $$.code = gen_code (temp) ; }
             | IDENTIF '[' expression ']'     { if (in_this_func($1.code)){
