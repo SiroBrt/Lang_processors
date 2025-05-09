@@ -144,13 +144,13 @@ sentence:     '-' term %prec UNARY_SIGN      { sprintf (temp, "%s negate", $2.co
             | PROGN body                     { $$ = $2 ; }
             | PRINT STRING                   { sprintf (temp, ".\" %s\"", $2.code) ;
                                                $$.code = gen_code (temp) ; }
-            | PRINC term                      { sprintf (temp, "%s .", $2.code) ;
+            | PRINC term                     { sprintf (temp, "%s .", $2.code) ;
                                                $$.code = gen_code (temp) ; }
             | PRINC STRING                   { sprintf (temp, ".\" %s\"", $2.code) ;
                                                $$.code = gen_code (temp) ; }
-            | IF '(' sentence ')' '(' branch ')' '(' branch')' { sprintf (temp, "%s IF %s ELSE %s THEN", $3.code, $6.code, $9.code) ;
+            | IF '(' sentence ')' '(' sentence ')' '(' sentence ')' { sprintf (temp, "%s IF %s ELSE %s THEN", $3.code, $6.code, $9.code) ;
                                                $$.code = gen_code (temp) ; }
-            | IF '(' sentence ')' '(' branch ')' { sprintf (temp, "%s IF %s THEN", $3.code, $6.code) ;
+            | IF '(' sentence ')' '(' sentence ')' { sprintf (temp, "%s IF %s THEN", $3.code, $6.code) ;
                                                $$.code = gen_code (temp) ; }
             | LOOP WHILE '(' sentence ')' DO  body { sprintf (temp, "BEGIN %s WHILE %s REPEAT", $4.code, $7.code) ;
                                                $$.code = gen_code (temp) ; }
@@ -162,7 +162,7 @@ sentence:     '-' term %prec UNARY_SIGN      { sprintf (temp, "%s negate", $2.co
                                                $$.code = gen_code (temp) ; }
             ;
 
-arg_def:      IDENTIF  arg_def               { sprintf (temp, "%s %s ! ", $2.code, $1.code) ;
+arg_def:      IDENTIF  arg_def               { sprintf (temp, "%s%s ! ", $2.code, $1.code) ;
                                                sprintf(declarations, "%s\nvariable %s", declarations, $1.code) ;
                                                $$.code = gen_code (temp) ; }
             |                                { temp[0] = '\0' ;
@@ -173,10 +173,6 @@ arguments:    term  arguments             { sprintf (temp, "%s %s", $1.code, $2.
                                                $$.code = gen_code (temp) ; }
             |                                { temp[0] = '\0' ;
                                                $$.code = gen_code(temp) ; }
-            ;
-
-branch:       body                           { $$ = $1 ; }
-            | sentence                       { $$ = $1 ; }
             ;
 
 term:         operand                        { $$ = $1 ; }
