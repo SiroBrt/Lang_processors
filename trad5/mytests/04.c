@@ -1,13 +1,14 @@
 #include <stdio.h>
 int a, b = 1, c;
-a = 1;
 
 foo(int a, int b) {
   if (a == b) {
     puts("cosa");
   } else {
     puts("nada");
+    return a - b;
   }
+  return a + b;
 }
 foo1() {
   printf("%d %d %d %d %d %d %d %d %d %d", 1 || 0, 1 && 1, !1, 1 != 2, 1 == 2,
@@ -19,6 +20,7 @@ foo1() {
 main() {
   int n;
   int i, j;
+  n = 2;
   while (i < n) {
     foo1();
     for (j = 0; j < i; j = j + 1) {
@@ -33,3 +35,5 @@ main() {
     }
   }
 }
+
+//@(main)
