@@ -145,7 +145,7 @@ body_code:    control_sentence body_code     { sprintf (temp, "%s %s", $1.code, 
 
 axiom_sentence:
               INTEGER ax_rec_def              { $$ = $2 ; }
-            | variable '=' operand            { sprintf (temp, "(setf %s %s)", $1.code, $3.code) ;
+            | variable '=' NUMBER             { sprintf (temp, "(setf %s %s)", $1.code, $3.code) ;
                                                $$.code = gen_code(temp) ; }
             ;
             
