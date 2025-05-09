@@ -171,7 +171,7 @@ control_sentence:
             | IF '(' expression ')' '{' branch '}' ELSE '{' branch '}' 
               { sprintf (temp, "(if %s %s %s)", $3.code, $6.code, $10.code) ;
                 $$.code = gen_code (temp) ; }
-            | FOR '(' axiom_sentence ';' expression ';' variable '=' expression ')' '{' body_code '}' 
+            | FOR '(' for_def ';' expression ';' variable '=' expression ')' '{' body_code '}' 
               { sprintf (temp, "%s (loop while %s do %s (setf %s %s))", $3.code , $5.code, $12.code, $7.code, $9.code) ;
                 $$.code = gen_code (temp) ; }
             ;
@@ -182,6 +182,22 @@ branch:       control_sentence body_code     { sprintf (temp, "(progn %s %s)", $
                                                $$.code = gen_code(temp) ; }
             | control_sentence               { $$ = $1 ; }
             | sentence ';'                   { $$ = $1 ; }
+            ;
+
+for_def:      INTEGER IDENTIF                { sprintf (temp, "(setq %s_%s 0)", func_name, $2.code) ;
+                                               sprintf(func_var[func_it], "%s", $2.code) ;
+                                               func_it++;
+                                               $$.code = gen_code(temp) ; }
+            | INTEGER IDENTIF '=' NUMBER     { sprintf (temp, "(setq %s_%s %d)", func_name, $2.code, $4.value) ;
+                                               sprintf(func_var[func_it], "%s", $2.code) ;
+                                               func_it++;
+                                               $$.code = gen_code(temp) ; }
+            | IDENTIF '=' expression         { if (in_this_func($1.code)){
+                                                 sprintf (temp, "(setf %s_%s %s)", func_name, $1.code, $3.code) ;
+                                               } else{
+                                                 sprintf (temp, "(setf %s %s)", $1.code, $3.code) ;
+                                               }
+                                               $$.code = gen_code (temp) ; }
             ;
 
 rec_print:    expression ',' rec_print       { sprintf (temp, "(princ %s) %s",$1.code, $3.code);
